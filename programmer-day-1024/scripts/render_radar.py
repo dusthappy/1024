@@ -16,7 +16,7 @@ import sys
 import xml.etree.ElementTree as ET
 
 
-RUBRIC_VERSION = "1024-8d-v2"
+RUBRIC_VERSION = "1024-8d-v3"
 DIMENSIONS = (
     "创意构思",
     "目标表达",
@@ -183,7 +183,7 @@ def render_svg(scores: tuple[int | float | Decimal | None, ...], theme: str = "l
     })
     element(root, "title", id="radar-title").text = "AI 创作高光图谱"
     element(root, "desc", id="radar-description").text = (
-        "满分 10.0，活动趣味评分，非专业测评。按顶部顺时针顺序："
+        "满分 10.0，活动趣味评分，非专业测评。分项等级加权展示，小数不代表测量精度。按顶部顺时针顺序："
         + "；".join(
             f"{name}：{score_label(value)}"
             for name, value in zip(DIMENSIONS, scores)
@@ -197,10 +197,11 @@ def render_svg(scores: tuple[int | float | Decimal | None, ...], theme: str = "l
     )
     element(root, "rect", x="1", y="1", width=WIDTH - 2, height=HEIGHT - 2,
             rx="28", fill=palette["background"], stroke=palette["border"])
-    text_element(root, "AI 创作高光图谱", x="600", y="65", text_anchor="middle",
+    text_element(root, "AI 创作高光图谱", x="600", y="54", text_anchor="middle",
                  font_size="34", font_weight="700", fill=palette["text"])
-    element(root, "line", x1="570", y1="86", x2="630", y2="86",
-            stroke=palette["accent"], stroke_width="3", stroke_linecap="round")
+    text_element(root, "活动趣味评分 · 非专业测评", id="radar-assessment-notice",
+                 x="600", y="94", text_anchor="middle",
+                 font_size="24", font_weight="600", fill=palette["text"])
 
     grid = element(root, "g", id="radar-grid", fill="none")
     for level in GRID_LEVELS:
@@ -258,8 +259,12 @@ def render_svg(scores: tuple[int | float | Decimal | None, ...], theme: str = "l
                      font_size="21" if value is None else "25", font_weight="650",
                      fill=palette["muted"] if value is None else palette["accent"])
 
-    text_element(root, "满分 10.0 · 活动趣味评分 · 非专业测评", x="600", y="963", text_anchor="middle",
-                 font_size="18", fill=palette["muted"])
+    text_element(root, "满分 10.0 · 分项等级加权展示", id="radar-scale-notice",
+                 x="600", y="935", text_anchor="middle",
+                 font_size="24", fill=palette["text"])
+    text_element(root, "小数不代表测量精度", id="radar-precision-notice",
+                 x="600", y="973", text_anchor="middle",
+                 font_size="24", font_weight="600", fill=palette["text"])
     ET.indent(root, space="  ")
     return '<?xml version="1.0" encoding="UTF-8"?>\n' + ET.tostring(root, encoding="unicode") + "\n"
 

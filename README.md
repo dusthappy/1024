@@ -22,9 +22,18 @@
 
 <img src="docs/demo/1024-poster.png" width="560" alt="一次真实生成的 1024 程序员节 AI 高光海报：巧思成器，含八维雷达图" />
 
-这是一次真实生成的效果，展示了称号、夸赞关键词、能力短句、口号与八维雷达图如何组合成礼物。**文案和分数会随用户的可见证据变化，不是照搬这张图的固定模板。**
+这是保留的 v2 真实创作示例，展示了称号、夸赞关键词、能力短句、口号与八维雷达图如何组合成礼物，不作为 v3 的判级样本。**文案和分数会随用户的可见证据变化，不是照搬这张图的固定模板。** v3 会在图表标题附近清楚标明“活动趣味评分 · 非专业测评”，并注明“小数不代表测量精度”。
 
 [查看 PNG](docs/demo/1024-poster.png) · [查看 SVG 源稿](docs/demo/1024-poster.svg)
+
+<details>
+<summary>查看 v3 的图表说明与缺证展示（虚构样例分数）</summary>
+
+<img src="docs/demo/radar-v3.png" width="560" alt="v3 雷达图：标题处说明活动趣味评分，底部说明分项等级加权展示、小数不代表测量精度，缺证轴标待探索" />
+
+这是一张用于说明图表规则的组件预览，不是用户画像或完整海报。[SVG 源稿](docs/demo/radar-v3.svg)
+
+</details>
 
 ## 安装方式
 
@@ -61,7 +70,9 @@
 
 固定八维为：**创意构思、目标表达、AI统筹、判断取舍、迭代打磨、知识复用、多元表达、应变交付**。
 
-每维满分 **10.0**，统一保留一位小数。规则版本为 `1024-8d-v2`：维度指标 A、B 各占 25%，复杂要求处理 C 占 20%，实际成效 E 占 30%；四项按有依据的 0–4 级锚点判定，再使用十进制四舍五入计算。
+每维满分 **10.0**，统一保留一位小数。规则版本为 `1024-8d-v3`：维度指标 A、B 各占 25%，复杂要求处理 C 占 20%，实际成效 E 占 30%；先固定可见用户行为的证据范围，按 [相邻等级校准例](programmer-day-1024/references/rating-calibration.md) 逐格判定 0–4 级，再使用十进制四舍五入计算。v3 保留原有权重与公式，补齐判级门槛、证据裁决和图中精度说明；旧评级须复核，不能只改版本号。
+
+一位小数是**整数等级的加权显示，不是 0.1 分的测量精度**。600 个有效评级组合只产生 68 种可达分值，不支持任意微调尾数，也不凭微小分差判断能力高低。相同整数评级的计算可复现，独立 Agent 首次判读自然语言的主观性仍存在；目前没有正式的评审者一致率数据。
 
 这是基于当前可见证据的**活动趣味评分，不是专业能力测评或排名**。缺少直接用户证据的维度显示“待探索”，不会凭空补分，也不会把 Agent 的工具数量或自主操作算作用户能力。图表与数值来自同一份数据。
 
@@ -82,20 +93,27 @@ python3 scripts/render_radar.py --input chart-data.json --output radar.svg --the
 
 脚本默认拒绝覆盖已有输出，明确需要重建时可加 `--force`。输入格式、等级定义、计算公式和图表要求见 [评分与图表规则](programmer-day-1024/references/scoring-and-chart.md)；文案与视觉方法见 [用户高光表达](programmer-day-1024/references/portrait-framework.md)。
 
+维护者可在仓库根目录运行 `python3 -B -m unittest discover -s tests -v`，检查完整评级组合、四舍五入、版本校验、缺失轴几何及图中说明的可见性。它验证实现合同，不代替真实用户证据的判级一致性研究。
+
 ## 仓库结构
 
 ```text
 README.md
 docs/demo/
 ├── 1024-poster.png
-└── 1024-poster.svg
+├── 1024-poster.svg
+├── radar-v3.png
+└── radar-v3.svg
 programmer-day-1024/
 ├── SKILL.md
 ├── agents/openai.yaml
 ├── references/
 │   ├── portrait-framework.md
+│   ├── rating-calibration.md
 │   └── scoring-and-chart.md
 └── scripts/
     ├── score_profile.py
     └── render_radar.py
+tests/
+└── test_scoring_contract.py
 ```
